@@ -56,6 +56,10 @@
             margin-top: 15px;
             font-size: 16px;
         }
+        .leaderboard {
+            margin-top: 20px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -64,6 +68,7 @@
         <div id="quiz"></div>
         <button class="next-btn" onclick="nextQuestion()">Nästa fråga</button>
         <div class="accuracy" id="accuracy">Rätt: 0%</div>
+        <div class="leaderboard" id="leaderboard">Bästa resultat: 0 frågor utan fel</div>
     </div>
     <script>
         const questions = [
@@ -72,44 +77,47 @@
             { question: "Vad är naturligt urval?", answers: ["De bäst anpassade överlever", "Slumpmässig förändring", "Djur väljer att utvecklas"], correct: 0 }
         ];
         
-        let currentQuestion = 0;
         let correctAnswers = 0;
+        let totalQuestions = 0;
+        let bestStreak = 0;
+        let currentStreak = 0;
         
         function loadQuestion() {
             const quizDiv = document.getElementById("quiz");
             quizDiv.innerHTML = "";
-            const q = questions[currentQuestion];
+            const q = questions[Math.floor(Math.random() * questions.length)];
             let questionElement = `<div class='question'>${q.question}</div>`;
             q.answers.forEach((answer, index) => {
-                questionElement += `<div class='options'><button onclick='checkAnswer(this, ${index})'>${answer}</button></div>`;
+                questionElement += `<div class='options'><button onclick='checkAnswer(this, ${index}, ${q.correct})'>${answer}</button></div>`;
             });
             quizDiv.innerHTML = questionElement;
         }
         
-        function checkAnswer(button, index) {
-            const q = questions[currentQuestion];
-            if (index === q.correct) {
+        function checkAnswer(button, index, correct) {
+            if (index === correct) {
                 button.classList.add("correct");
                 correctAnswers++;
-                updateAccuracy();
+                currentStreak++;
+                if (currentStreak > bestStreak) {
+                    bestStreak = currentStreak;
+                    document.getElementById("leaderboard").innerText = `Bästa resultat: ${bestStreak} frågor utan fel`;
+                }
             } else {
                 button.classList.add("wrong");
+                currentStreak = 0;
             }
+            totalQuestions++;
+            updateAccuracy();
         }
         
         function updateAccuracy() {
             const accuracyDiv = document.getElementById("accuracy");
-            let percentage = ((correctAnswers / (currentQuestion + 1)) * 100).toFixed(2);
+            let percentage = ((correctAnswers / totalQuestions) * 100).toFixed(2);
             accuracyDiv.innerHTML = `Rätt: ${percentage}%`;
         }
         
         function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                loadQuestion();
-            } else {
-                alert("Quizet är klart!");
-            }
+            loadQuestion();
         }
         
         loadQuestion();
