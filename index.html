@@ -33,8 +33,28 @@
             background: #007BFF;
             color: white;
         }
-        .options button:hover {
+        .options button.correct {
+            background: #28a745;
+        }
+        .options button.wrong {
+            background: #dc3545;
+        }
+        .next-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007BFF;
+            color: white;
+            font-size: 16px;
+        }
+        .next-btn:hover {
             background: #0056b3;
+        }
+        .accuracy {
+            margin-top: 15px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -42,48 +62,45 @@
     <div class="quiz-container">
         <h1>Kunskapsquiz: Livets Utveckling</h1>
         <div id="quiz"></div>
-        <button onclick="nextQuestion()">Nästa fråga</button>
+        <button class="next-btn" onclick="nextQuestion()">Nästa fråga</button>
+        <div class="accuracy" id="accuracy">Rätt: 0%</div>
     </div>
     <script>
         const questions = [
             { question: "Vad betyder evolution?", answers: ["Förändring över tid", "Att djur blir större", "Att alla arter förblir desamma"], correct: 0 },
             { question: "Vem utvecklade evolutionsteorin?", answers: ["Isaac Newton", "Charles Darwin", "Albert Einstein"], correct: 1 },
-            { question: "Vad är naturligt urval?", answers: ["De bäst anpassade överlever", "Slumpmässig förändring", "Djur väljer att utvecklas"], correct: 0 },
-            { question: "Vad är fossil?", answers: ["Förstenade rester av organismer", "Djurben", "Moderna skelett"], correct: 0 },
-            { question: "Vilka djurgrupper utvecklades först?", answers: ["Blötdjur", "Fåglar", "Däggdjur"], correct: 0 },
-            { question: "Vad upptäckte Carl von Linné?", answers: ["Ett system för att namnge arter", "Evolutionsteorin", "Hur fossiler bildas"], correct: 0 },
-            { question: "Vad är en art?", answers: ["En grupp organismer som kan få fertil avkomma", "Alla djur", "Alla växter"], correct: 0 },
-            { question: "Vilken funktion har DNA i evolutionen?", answers: ["Bär genetisk information", "Bestämmer djurens storlek", "Är en energikälla"], correct: 0 },
-            { question: "Vad betyder växelvarm?", answers: ["Att kroppstemperaturen ändras med omgivningen", "Att djuret alltid är varmt", "Att djuret ändrar färg"], correct: 0 },
-            { question: "Vilken av dessa är ett kräldjur?", answers: ["Orm", "Grodor", "Fiskar"], correct: 0 },
-            { question: "Hur skapas fossil?", answers: ["Organismer begravs och mineraliseras", "Djur förstenas direkt", "De bildas ur lava"], correct: 0 },
-            { question: "Varför kan kräldjur leva på land?", answers: ["De har fjäll och ägg med hårda skal", "De har päls", "De andas under vatten"], correct: 0 },
-            { question: "Vad är en mutation?", answers: ["En förändring i DNA", "En sjukdom", "En evolutionär återgång"], correct: 0 },
-            { question: "Vad betyder jämnvarm?", answers: ["Att djuret har konstant kroppstemperatur", "Att djuret byter temperatur beroende på miljön", "Att djuret har ett jämnt mönster"], correct: 0 },
-            { question: "Vad studerade Darwin på Galapagosöarna?", answers: ["Finkar", "Tigrar", "Dinosaurier"], correct: 0 },
-            { question: "Vilka olika typer av celler finns?", answers: ["Djurocell och växtcell", "Blodcell och muskelcell", "Bakteriecell och fiskcell"], correct: 0 },
-            { question: "Vad är skillnaden mellan växelvarma och jämnvarma djur?", answers: ["Växelvarma ändrar kroppstemperatur, jämnvarma har stabil temperatur", "Jämnvarma byter färg, växelvarma gör inte det", "Det finns ingen skillnad"], correct: 0 },
-            { question: "Vad är en anpassning?", answers: ["En egenskap som hjälper en organism överleva", "En oviktig förändring", "En tillfällig förändring"], correct: 0 }
+            { question: "Vad är naturligt urval?", answers: ["De bäst anpassade överlever", "Slumpmässig förändring", "Djur väljer att utvecklas"], correct: 0 }
         ];
         
         let currentQuestion = 0;
+        let correctAnswers = 0;
+        
         function loadQuestion() {
             const quizDiv = document.getElementById("quiz");
             quizDiv.innerHTML = "";
             const q = questions[currentQuestion];
             let questionElement = `<div class='question'>${q.question}</div>`;
             q.answers.forEach((answer, index) => {
-                questionElement += `<div class='options'><button onclick='checkAnswer(${index})'>${answer}</button></div>`;
+                questionElement += `<div class='options'><button onclick='checkAnswer(this, ${index})'>${answer}</button></div>`;
             });
             quizDiv.innerHTML = questionElement;
         }
         
-        function checkAnswer(index) {
-            if (index === questions[currentQuestion].correct) {
-                alert("Rätt svar!");
+        function checkAnswer(button, index) {
+            const q = questions[currentQuestion];
+            if (index === q.correct) {
+                button.classList.add("correct");
+                correctAnswers++;
+                updateAccuracy();
             } else {
-                alert("Fel, försök igen.");
+                button.classList.add("wrong");
             }
+        }
+        
+        function updateAccuracy() {
+            const accuracyDiv = document.getElementById("accuracy");
+            let percentage = ((correctAnswers / (currentQuestion + 1)) * 100).toFixed(2);
+            accuracyDiv.innerHTML = `Rätt: ${percentage}%`;
         }
         
         function nextQuestion() {
